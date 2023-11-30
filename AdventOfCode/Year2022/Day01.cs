@@ -2,6 +2,7 @@ namespace Year2022;
 
 public class Day01
 {
+    //Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?
     [Theory]
     [InlineData("Day01_Sample.txt", "Elf 4", 24000)]
     [InlineData("Day01_Input.txt", "Elf 151", 69912)]
@@ -12,7 +13,8 @@ public class Day01
         Assert.Equal(topElf, topElfData.Key);
         Assert.Equal(calories, topElfData.Value);
     }
-    
+
+    //Find the top three Elves carrying the most Calories. How many Calories are those Elves carrying in total?
     [Theory]
     [InlineData("Day01_Sample.txt", "Elf 4", "Elf 3", "Elf 5", 45000)]
     [InlineData("Day01_Input.txt", "Elf 151", "Elf 36", "Elf 211", 208180)]
