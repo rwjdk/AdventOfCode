@@ -1,0 +1,2 @@
+Q: Where is the rest of 2022 Days?
+A: I was not part of AOC in 2022; The only reason Day 01 is here was to get a feel for how the puzzles flowed prior to the first day of 2023
