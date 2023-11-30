@@ -20,10 +20,11 @@ public class Day01
     {
         var data = GetElvesAndTheirCarriedCalories(inputFile);
         var top3Elves = data.OrderByDescending(x=> x.Value).Take(3).ToDictionary();
-        
-        Assert.Equal(top1Elf, top3Elves.Keys.ToList()[0]);
-        Assert.Equal(top2Elf, top3Elves.Keys.ToList()[1]);
-        Assert.Equal(top3Elf, top3Elves.Keys.ToList()[2]);
+
+        var top3ElveNames = top3Elves.Keys.ToList();
+        Assert.Equal(top1Elf, top3ElveNames[0]);
+        Assert.Equal(top2Elf, top3ElveNames[1]);
+        Assert.Equal(top3Elf, top3ElveNames[2]);
         Assert.Equal(top3TotalCalories, top3Elves.Sum(x=> x.Value));
     }
 
