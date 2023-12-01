@@ -93,21 +93,14 @@ public static class StringExtensions
     };
 
     [DebuggerDisplay("{Value} '{StringRepresentation}'")]
-    private class Digit
+    private class Digit(string stringRepresentation, int value)
     {
-        public string StringRepresentation { get; }
-        public int Value { get; }
+        public string StringRepresentation { get; } = stringRepresentation;
+        public int Value { get; } = value;
 
-        public Digit(int value)
+        public Digit(int value) : this(value.ToString(), value)
         {
-            StringRepresentation = value.ToString();
-            Value = value;
-        }
-
-        public Digit(string stringRepresentation, int value)
-        {
-            StringRepresentation = stringRepresentation;
-            Value = value;
+            //Empty
         }
     }
 }
