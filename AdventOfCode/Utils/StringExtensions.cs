@@ -17,31 +17,46 @@ public static class StringExtensions
     public static int GetFirstDigitInString(this string input, bool includeSpelledOutDigits)
     {
         var digits = includeSpelledOutDigits ? NormalAndSpelledOutDigits : NormalDigits;
-        KeyValuePair<Digit, int> lowestIndexDigit = new(new Digit(0), int.MaxValue);
+        int lowestIndex = int.MaxValue;
+        Digit? firstDigit = null;
         foreach (var digit in digits)
         {
-            var indexOf = input.IndexOf(digit.StringRepresentation, StringComparison.OrdinalIgnoreCase);
-            if (indexOf != -1 && indexOf < lowestIndexDigit.Value)
+            var index = input.IndexOf(digit.StringRepresentation, StringComparison.OrdinalIgnoreCase);
+            if (index != -1 && index < lowestIndex)
             {
-                lowestIndexDigit = new(digit, indexOf);
+                lowestIndex = index;
+                firstDigit = digit;
+                
+                if (lowestIndex == 0)
+                {
+                    break; //short-circuit if lowestIndex is 0 (can't get lower so no need to proceed further)
+                }
             }
         }
-        return lowestIndexDigit.Key.Value != 0 ? lowestIndexDigit.Key.Value : throw new ArgumentException("No digits in string");
+        return firstDigit?.Value ?? throw new ArgumentException("No digits in string");
     }
 
     public static int GetLastDigitInString(this string input, bool includeSpelledOutDigits)
     {
+        var inputLength = input.Length;
         var digits = includeSpelledOutDigits ? NormalAndSpelledOutDigits : NormalDigits;
-        KeyValuePair<Digit, int> highestIndexDigit = new(new Digit(0), int.MinValue);
+        int highestIndex = int.MinValue;
+        Digit? lastDigit = null;
         foreach (var digit in digits)
         {
-            var indexOf = input.LastIndexOf(digit.StringRepresentation, StringComparison.OrdinalIgnoreCase);
-            if (indexOf != -1 && indexOf > highestIndexDigit.Value)
+            var index = input.LastIndexOf(digit.StringRepresentation, StringComparison.OrdinalIgnoreCase);
+            if (index != -1 && index > highestIndex)
             {
-                highestIndexDigit = new(digit, indexOf);
+                highestIndex = index;
+                lastDigit = digit;
+                
+                if (highestIndex == inputLength-1)
+                {
+                    break; //short-circuit if second to last (can't get higher so no need to proceed further)
+                }
             }
         }
-        return highestIndexDigit.Key.Value != 0 ? highestIndexDigit.Key.Value : throw new ArgumentException("No digits in string");
+        return lastDigit?.Value ?? throw new ArgumentException("No digits in string");
     }
 
     private static readonly Digit[] NormalDigits = {
