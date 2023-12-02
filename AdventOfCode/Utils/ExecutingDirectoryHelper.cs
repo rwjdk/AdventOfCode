@@ -7,7 +7,7 @@ public static class ExecutingDirectoryHelper
         return Path.Combine(GetExecutingDirectory(), "InputData");
     }
 
-    public static string GetExecutingDirectory()
+    private static string GetExecutingDirectory()
     {
         return Path.GetDirectoryName(typeof(ExecutingDirectoryHelper).Assembly.Location)!;
     }

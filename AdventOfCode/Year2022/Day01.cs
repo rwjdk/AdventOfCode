@@ -21,13 +21,13 @@ public class Day01
     public void Part2(string inputFile, string top1Elf, string top2Elf, string top3Elf, int top3TotalCalories)
     {
         var data = GetElvesAndTheirCarriedCalories(inputFile);
-        var top3Elves = data.OrderByDescending(x=> x.Value).Take(3).ToDictionary();
+        var top3Elves = data.OrderByDescending(x => x.Value).Take(3).ToDictionary();
 
         var top3ElvesNames = top3Elves.Keys.ToList();
         Assert.Equal(top1Elf, top3ElvesNames[0]);
         Assert.Equal(top2Elf, top3ElvesNames[1]);
         Assert.Equal(top3Elf, top3ElvesNames[2]);
-        Assert.Equal(top3TotalCalories, top3Elves.Sum(x=> x.Value));
+        Assert.Equal(top3TotalCalories, top3Elves.Sum(x => x.Value));
     }
 
     private static Dictionary<string, int> GetElvesAndTheirCarriedCalories(string inputFile)
