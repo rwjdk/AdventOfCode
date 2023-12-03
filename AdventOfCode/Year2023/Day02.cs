@@ -6,11 +6,13 @@ namespace Year2023;
 //https://adventofcode.com/2023/day/2
 public class Day02
 {
+    private const string Day = "Day02";
+
     //Determine which games would have been possible if the bag had been loaded with only 12 red cubes, 13 green cubes, and 14 blue cubes.
     //What is the sum of the IDs of those games?
     [Theory]
-    [InlineData("Day02_Sample.txt", 5, 3, 8)]
-    [InlineData("Day02_Input.txt", 100, 37, 1853)]
+    [InlineData($"{Day}_Sample.txt", 5, 3, 8)]
+    [InlineData($"{Day}_Input.txt", 100, 37, 1853)]
     public void Part1(string inputFile, int expectedTotalNumberOfGames, int expectedValidGames, int expectedSumOfValidGameIds)
     {
         List<Day02Game> games = InputReader.ReadInputLines(inputFile).Select(x => x.ToGame()).ToList();
@@ -18,29 +20,27 @@ public class Day02
 
         var validGames = games.Where(x => x.ObeyMaxColorRules(maxBlue: 14, maxRed: 12, maxGreen: 13)).ToList();
         Assert.Equal(expectedValidGames, validGames.Count);
-
-        Assert.Equal(expectedSumOfValidGameIds, validGames.Sum(x => x.GameNumber));
+        var calculatedAnswer = validGames.Sum(x => x.GameNumber);
+        Assert.Equal(expectedSumOfValidGameIds, calculatedAnswer);
     }
 
     //The power of a set of cubes is equal to the numbers of red, green, and blue cubes multiplied together
     //For each game, find the minimum set of cubes that must have been present.
     //What is the sum of the power of these sets?
     [Theory]
-    [InlineData("Day02_Sample.txt", 2286)]
-    [InlineData("Day02_Input.txt", 72706)]
+    [InlineData($"{Day}_Sample.txt", 2286)]
+    [InlineData($"{Day}_Input.txt", 72706)]
     public void Part2(string inputFile, int expectedPowerOfTheSets)
     {
+        int calculatedAnswer = 0;
         List<Day02Game> games = InputReader.ReadInputLines(inputFile).Select(x => x.ToGame()).ToList();
-
-        int totalPower = 0;
         foreach (Day02Game game in games)
         {
             var (neededGreen, neededBlue, neededRed) = game.GetMaxNeededCubes();
             int power = neededGreen * neededBlue * neededRed;
-            totalPower += power;
+            calculatedAnswer += power;
         }
-
-        Assert.Equal(expectedPowerOfTheSets, totalPower);
+        Assert.Equal(expectedPowerOfTheSets, calculatedAnswer);
     }
 }
 

@@ -6,25 +6,29 @@ namespace Year2023;
 //https://adventofcode.com/2023/day/1
 public class Day01
 {
+    private const string Day = "Day01"; //TODO add day
+
     //On each line, the calibration value can be found by combining the first digit and the last digit (in that order) to form a single two-digit number.
     //In Sample values of these four lines are 12, 38, 15, and 77. Adding these together produces 142.
     //What is the sum of all of the calibration values?
     [Theory]
-    [InlineData("Day01_Sample1.txt", 142)]
-    [InlineData("Day01_Input.txt", 55712)]
-    public void Part1(string inputFile, int expectedTotal)
+    [InlineData($"{Day}_Sample1.txt", 142)]
+    [InlineData($"{Day}_Input.txt", 55712)]
+    public void Part1(string inputFile, int expectedAnswer)
     {
-        Assert.Equal(expectedTotal, GetSum(inputFile, false));
+        var calculatedAnswer = GetSum(inputFile, false);
+        Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 
     //It looks like some of the digits are actually spelled out with letters: one, two, three, four, five, six, seven, eight, and nine also count as valid "digits".
     //What is the sum of all of the calibration values with the "extra" special digits
     [Theory]
-    [InlineData("Day01_Sample2.txt", 281)]
-    [InlineData("Day01_Input.txt", 55413)]
-    public void Part2(string inputFile, int expectedTotal)
+    [InlineData($"{Day}_Sample2.txt", 281)]
+    [InlineData($"{Day}_Input.txt", 55413)]
+    public void Part2(string inputFile, int expectedAnswer)
     {
-        Assert.Equal(expectedTotal, GetSum(inputFile, true));
+        var calculatedAnswer = GetSum(inputFile, true);
+        Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 
     private int GetSum(string inputFile, bool includeSpelledOutDigits)
