@@ -9,10 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "Utils\Utils.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Year2023", "Year2023\Year2023.csproj", "{7631096E-1026-459C-B0EF-C39338E7EE3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{282B8853-AA31-4BFC-803A-ADB782F55163}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp2", "ConsoleApp2\ConsoleApp2.csproj", "{7E9C0972-178A-4F95-BDF3-E095997BC5C5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,14 +27,6 @@ Global
 		{7631096E-1026-459C-B0EF-C39338E7EE3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7631096E-1026-459C-B0EF-C39338E7EE3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7631096E-1026-459C-B0EF-C39338E7EE3F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{282B8853-AA31-4BFC-803A-ADB782F55163}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{282B8853-AA31-4BFC-803A-ADB782F55163}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{282B8853-AA31-4BFC-803A-ADB782F55163}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{282B8853-AA31-4BFC-803A-ADB782F55163}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7E9C0972-178A-4F95-BDF3-E095997BC5C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7E9C0972-178A-4F95-BDF3-E095997BC5C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7E9C0972-178A-4F95-BDF3-E095997BC5C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7E9C0972-178A-4F95-BDF3-E095997BC5C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
