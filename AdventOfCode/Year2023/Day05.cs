@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using Utils;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Year2023;
 
@@ -30,16 +29,25 @@ public class Day05
 
     //What is the lowest location number that corresponds to any of the initial seed numbers (given that they are ranges)?
     [Theory]
-    //[InlineData($"{Day}_Sample.txt", 46)]
-    [InlineData($"{Day}_Input.txt", 7873085)]
-    public void Part2(string inputFile, int expectedAnswer)
+    [InlineData($"{Day}_Sample.txt", 46)]
+    [InlineData($"{Day}_Input.txt", 7873084)] //This one t
+    public async Task Part2(string inputFile, int expectedAnswer)
     {
         var almanac = InputReader.ReadInputLines(inputFile).ToDay05Almanac();
         long lowestLocation = long.MaxValue;
         var seedRanges = almanac.GetSeedRanges();
+        List<Task<long>> tasks = new();
         foreach (var seedRange in seedRanges)
         {
-            long location = seedRange.GetLowestLocation(almanac);
+            var task = new Task<long>(() => seedRange.GetLowestLocation(almanac));
+            task.Start();
+            tasks.Add(task);
+        }
+        await Task.WhenAll(tasks);
+
+        foreach (var task in tasks)
+        {
+            long location = task.Result;
             if (location < lowestLocation)
             {
                 lowestLocation = location;
@@ -67,6 +75,12 @@ public record Day05SeedRange(long StartSeed, long Range)
 
         return lowestLocation;
     }
+
+    public override string ToString()
+    {
+        return $"Start:{StartSeed} - Range: {Range}";
+
+    }
 }
 
 public record Day05Almanac(List<long> Seeds, Dictionary<string, Day05AlmanacMap> Maps)
@@ -91,7 +105,7 @@ public record Day05AlmanacMap(string SourceCategory, string DestinationCategory,
     {
         return $"{SourceCategory} > {DestinationCategory}";
     }
-
+    
     public long GetDestinationNumber(long source)
     {
         foreach (var range in Ranges)
