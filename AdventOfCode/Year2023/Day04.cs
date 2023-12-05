@@ -51,15 +51,12 @@ public static class Day04Extensions
         int card = Convert.ToInt32(cardAndNumbers[0][4..].Trim());
 
         string[] numberParts = cardAndNumbers[1].Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-        List<int> winningNumbers = StringToNumbers(numberParts[0]);
-        List<int> yourNumbers = StringToNumbers(numberParts[1]);
+        List<int> winningNumbers = numberParts[0].SplitToNumbers(' ');
+        List<int> yourNumbers = numberParts[1].SplitToNumbers(' ');
 
         return new Day04Card(card, winningNumbers, yourNumbers);
 
-        List<int> StringToNumbers(string stringWithNumbers)
-        {
-            return stringWithNumbers.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt32(x.Trim())).ToList();
-        }
+
     }
 }
 
