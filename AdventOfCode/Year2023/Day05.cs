@@ -30,7 +30,7 @@ public class Day05
     //What is the lowest location number that corresponds to any of the initial seed numbers (given that they are ranges)?
     [Theory]
     [InlineData($"{Day}_Sample.txt", 46)]
-    [InlineData($"{Day}_Input.txt", 7873084)] //This one t
+    [InlineData($"{Day}_Input.txt", 7873084)] //This one take a loooong time to run (3+ minutes)
     public async Task Part2(string inputFile, int expectedAnswer)
     {
         var almanac = InputReader.ReadInputLines(inputFile).ToDay05Almanac();
