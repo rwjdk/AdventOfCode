@@ -7,31 +7,85 @@ public class Day06
 {
     private const string Day = "Day06";
 
-    //TODO: Add Part 1 Description
+    //Determine the number of ways you could beat the record in each race.What do you get if you multiply these numbers together?
     [Theory]
-    [InlineData($"{Day}_Sample.txt", 0)]
-    [InlineData($"{Day}_Input.txt", 0)]
+    [InlineData($"{Day}_Sample.txt", 288)]
+    [InlineData($"{Day}_Input.txt", 293046)]
     public void Part1(string inputFile, int expectedAnswer)
     {
         int calculatedAnswer = 0;
-        var inputLines = InputReader.ReadInputLines(inputFile);
-        throw new NotImplementedException();
+        var races = InputReader.ReadInputLines(inputFile).ToDay06RacesPart1();
+        foreach (var race in races)
+        {
+            int numberOfWays = race.GetNumberOfWaysToBeatCurrentRecord();
+            if (calculatedAnswer == 0)
+            {
+                calculatedAnswer = numberOfWays;
+            }
+            else
+            {
+                calculatedAnswer *= numberOfWays;
+            }
+        }
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 
-    //TODO: Add Part 2 Description
+    //How many ways can you beat the record in this one much longer race?
     [Theory]
-    [InlineData($"{Day}_Sample.txt", 0)]
-    [InlineData($"{Day}_Input.txt", 0)]
+    [InlineData($"{Day}_Sample.txt", 71503)]
+    [InlineData($"{Day}_Input.txt", 35150181)]
     public void Part2(string inputFile, int expectedAnswer)
     {
-        int calculatedAnswer = 0;
-        var inputLines = InputReader.ReadInputLines(inputFile);
-        throw new NotImplementedException();
-        Assert.Equal(expectedAnswer, calculatedAnswer);
+        var race = InputReader.ReadInputLines(inputFile).ToDay06RacePart2();
+        int numberOfWays = race.GetNumberOfWaysToBeatCurrentRecord();
+        Assert.Equal(expectedAnswer, numberOfWays);
     }
 }
 
 public static class Day06Extensions
 {
+    public static List<Day06Race> ToDay06RacesPart1(this string[] lines)
+    {
+        var result = new List<Day06Race>();
+
+        var instructionAndDurations = lines[0].Split(":", StringSplitOptions.RemoveEmptyEntries);
+        var instructionAndRecordDistances = lines[1].Split(":", StringSplitOptions.RemoveEmptyEntries);
+
+        var durations = instructionAndDurations[1].SplitToLongNumbers(' ');
+        var recordTimes = instructionAndRecordDistances[1].SplitToLongNumbers(' ');
+        for (int i = 0; i < durations.Count; i++)
+        {
+            result.Add(new Day06Race(durations[i], recordTimes[i]));
+        }
+        return result;
+    }
+    
+    public static Day06Race ToDay06RacePart2(this string[] lines)
+    {
+        var instructionAndDuration = lines[0].Split(":", StringSplitOptions.RemoveEmptyEntries);
+        var instructionAndRecordDistance = lines[1].Split(":", StringSplitOptions.RemoveEmptyEntries);
+
+        var duration = Convert.ToInt64(instructionAndDuration[1].Replace(" ", string.Empty));
+        var recordTime = Convert.ToInt64(instructionAndRecordDistance[1].Replace(" ", string.Empty));
+        
+        return new Day06Race(duration, recordTime);
+    }
+}
+
+public record Day06Race(long TotalDuration, long RecordDistance)
+{
+    public int GetNumberOfWaysToBeatCurrentRecord()
+    {
+        int numberOfWaysToBeatCurrentRecord = 0;
+        for (int durationToHoldButton = 1; durationToHoldButton < TotalDuration; durationToHoldButton++)
+        {
+            long remainingTimeForRace = TotalDuration - durationToHoldButton;
+            if (durationToHoldButton * remainingTimeForRace > RecordDistance)
+            {
+                numberOfWaysToBeatCurrentRecord++;
+            }
+        }
+
+        return numberOfWaysToBeatCurrentRecord;
+    }
 }
