@@ -1,4 +1,5 @@
-﻿using Utils;
+﻿using System.Diagnostics;
+using Utils;
 
 namespace Year2023;
 
@@ -7,31 +8,154 @@ public class Day07
 {
     private const string Day = "Day07";
 
-    //TODO: Add Part 1 Description
+    //What are the total winnings?
     [Theory]
-    [InlineData($"{Day}_Sample.txt", 0)]
-    [InlineData($"{Day}_Input.txt", 0)]
+    [InlineData($"{Day}_Sample.txt", 6440)]
+    [InlineData($"{Day}_Input.txt", 250946742)]
     public void Part1(string inputFile, int expectedAnswer)
     {
         int calculatedAnswer = 0;
-        var inputLines = InputReader.ReadInputLines(inputFile);
-        throw new NotImplementedException();
+        Day07Hand[] hands = InputReader.ReadInputLines(inputFile).ToDay07Hands(false);
+
+        var orderedHands = hands.OrderBy(x => (int)x.Strength).ThenBy(x => x.SecondaryStrength).ToList();
+        int rank = 1;
+        foreach (Day07Hand orderedHand in orderedHands)
+        {
+            calculatedAnswer += orderedHand.Bid * rank;
+            rank++;
+        }
+
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 
-    //TODO: Add Part 2 Description
+    //What are the new total winnings?
     [Theory]
-    [InlineData($"{Day}_Sample.txt", 0)]
-    [InlineData($"{Day}_Input.txt", 0)]
+    [InlineData($"{Day}_Sample.txt", 5905)]
+    [InlineData($"{Day}_Input.txt", 251824095)]
     public void Part2(string inputFile, int expectedAnswer)
     {
         int calculatedAnswer = 0;
-        var inputLines = InputReader.ReadInputLines(inputFile);
-        throw new NotImplementedException();
+        Day07Hand[] hands = InputReader.ReadInputLines(inputFile).ToDay07Hands(true);
+
+        var orderedHands = hands.OrderBy(x => (int)x.Strength).ThenBy(x => x.SecondaryStrength).ToList();
+        int rank = 1;
+        foreach (Day07Hand orderedHand in orderedHands)
+        {
+            calculatedAnswer += orderedHand.Bid * rank;
+            rank++;
+        }
+
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 }
 
 public static class Day07Extensions
 {
+    public static Day07Hand[] ToDay07Hands(this string[] inputLines, bool jokerRule)
+    {
+        var result = new List<Day07Hand>();
+        foreach (var inputLine in inputLines)
+        {
+            var parts = inputLine.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var handAsString = parts[0];
+            var bid = Convert.ToInt32(parts[1]);
+            result.Add(new Day07Hand(handAsString, bid, jokerRule));
+        }
+
+        return result.ToArray();
+    }
+}
+
+[DebuggerDisplay("{HandAsString} = {Strength} - Bid: {Bid}")]
+public class Day07Hand(string handAsString, int bid, bool jokerRule)
+{
+    public Day07HandStrength Strength = jokerRule ? CalculateJokerRuleStrength(handAsString) : CalculateNormalStrength(handAsString);
+    public readonly string SecondaryStrength = CalculateSecondaryStrength(handAsString, jokerRule);
+
+    private static string CalculateSecondaryStrength(string handAsString, bool jokerRule)
+    {
+        //Here we use a trick to make the hand sortable as a string by choosing higher ascii values for the higher cards
+        return handAsString
+            .Replace("A", "E")
+            .Replace("K", "D")
+            .Replace("Q", "C")
+            .Replace("J", jokerRule ? "0" : "B")
+            .Replace("T", "A");
+    }
+
+    private static Day07HandStrength CalculateNormalStrength(string handAsString)
+    {
+        var typesOfCards = handAsString.GroupBy(x => x).ToList();
+        var anyThreeOfAKind = typesOfCards.Any(x => x.Count() is 3);
+        var anyPair = typesOfCards.Any(x => x.Count() is 2);
+        switch (typesOfCards.Count)
+        {
+            case 1:
+                return Day07HandStrength.FiveOfAKind;
+            case 2:
+                return anyPair ? Day07HandStrength.FullHouse : Day07HandStrength.FourOfAKind;
+            case 3:
+                return anyThreeOfAKind ? Day07HandStrength.ThreeOfAKind : Day07HandStrength.TwoPair;
+            case 4:
+                return Day07HandStrength.OnePair;
+            case 5:
+                return Day07HandStrength.HighCard;
+        }
+        throw new ArgumentException("Invalid Input", nameof(handAsString));
+    }
+
+    private static Day07HandStrength CalculateJokerRuleStrength(string handAsString)
+    {
+        //Jokers are wildcards
+        var numberOfJokers = 5 - handAsString.Replace("J", "").Length;
+        bool anyJokers = numberOfJokers > 0;
+        bool singleJoker = numberOfJokers == 1;
+        bool moreThanOneJoker = numberOfJokers > 1;
+
+        var typesOfCards = handAsString.GroupBy(x => x).ToList();
+        var anyThreeOfAKind = typesOfCards.Any(x => x.Count() is 3);
+        var anyPair = typesOfCards.Any(x => x.Count() is 2);
+
+        switch (typesOfCards.Count)
+        {
+            case 1:
+                return Day07HandStrength.FiveOfAKind;
+            case 2:
+                return anyJokers ? Day07HandStrength.FiveOfAKind : anyPair ? Day07HandStrength.FullHouse : Day07HandStrength.FourOfAKind;
+            case 3:
+                if (moreThanOneJoker)
+                {
+                    return Day07HandStrength.FourOfAKind;
+                }
+                if (singleJoker && anyThreeOfAKind)
+                {
+                    return Day07HandStrength.FourOfAKind;
+                }
+                if (singleJoker)
+                {
+                    return Day07HandStrength.FullHouse;
+                }
+                return anyThreeOfAKind ? Day07HandStrength.ThreeOfAKind : Day07HandStrength.TwoPair;
+            case 4:
+                return anyJokers ? Day07HandStrength.ThreeOfAKind : Day07HandStrength.OnePair;
+            case 5:
+                return anyJokers ? Day07HandStrength.OnePair : Day07HandStrength.HighCard;
+        }
+
+        throw new ArgumentException("Invalid Input", nameof(handAsString));
+    }
+
+    public string HandAsString { get; init; } = handAsString;
+    public int Bid { get; init; } = bid;
+}
+
+public enum Day07HandStrength
+{
+    FiveOfAKind = 7,
+    FourOfAKind = 6,
+    FullHouse = 5,
+    ThreeOfAKind = 4,
+    TwoPair = 3,
+    OnePair = 2,
+    HighCard = 1,
 }
