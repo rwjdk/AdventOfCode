@@ -11,36 +11,35 @@ public class Day08
     [Theory]
     [InlineData($"{Day}_Sample1.txt", 2)]
     [InlineData($"{Day}_Sample2.txt", 6)]
-    [InlineData($"{Day}_Input.txt", 0)]
+    [InlineData($"{Day}_Input.txt", 15_517)]
     public void Part1(string inputFile, int expectedAnswer)
     {
         var map = InputReader.ReadInputLines(inputFile).Today08Map();
-        int calculatedAnswer = map.GetNumberOfStepsToReachZzz();
+        int calculatedAnswer = map.GetNumberOfStepsToReachGoal("AAA", "Z");
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 
     //How many steps does it take before you're only on nodes that end with Z?
     [Theory]
     [InlineData($"{Day}_Sample3.txt", 6)]
-    [InlineData($"{Day}_Input.txt", 0)]
+    [InlineData($"{Day}_Input.txt", 14_935_034_899_483)] //aka almost 15 trillion
     public void Part2(string inputFile, long expectedAnswer)
     {
         var map = InputReader.ReadInputLines(inputFile).Today08Map();
-        long calculatedAnswer = map.GetNumberOfGhostStepsToReachZzz();
+        //long calculatedAnswer = map.GetNumberOfGhostStepsToReachGoalBruteForce();
+        long calculatedAnswer = map.GetNumberOfGhostStepsToReachGoalFancyMath();
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 }
 
 public record Day08Map(Day08Direction[] Directions, Dictionary<string, Dictionary<Day08Direction, string>> Elements)
 {
-    public int GetNumberOfStepsToReachZzz()
+    public int GetNumberOfStepsToReachGoal(string currentLocation, string goal)
     {
         int steps = 0;
         int instructionIndex = 0;
-        string currentLocation = "AAA";
         string end = string.Empty;
-        const string goal = "ZZZ";
-        while (end != goal)
+        while (!end.EndsWith(goal))
         {
             if (instructionIndex == Directions.Length)
             {
@@ -55,7 +54,7 @@ public record Day08Map(Day08Direction[] Directions, Dictionary<string, Dictionar
         return steps;
     }
 
-    public long GetNumberOfGhostStepsToReachZzz()
+    public long GetNumberOfGhostStepsToReachGoalBruteForce() //Take days to run
     {
         const string destination = "Z";
         long steps = 0;
@@ -80,6 +79,35 @@ public record Day08Map(Day08Direction[] Directions, Dictionary<string, Dictionar
             }
         }
         return steps;
+    }
+
+    public long GetNumberOfGhostStepsToReachGoalFancyMath()
+    {
+        const string goal = "Z";
+        var currentLocations = Elements.Keys.Where(x => x.EndsWith("A")).ToArray();
+        List<long> stepToReachGoalForEachLocation = [];
+        foreach (var currentLocation in currentLocations)
+        {
+            var numberOfStepsToReachGoal = GetNumberOfStepsToReachGoal(currentLocation, goal);
+            stepToReachGoalForEachLocation.Add(numberOfStepsToReachGoal);
+        }
+
+        var result = LeastCommonMultipleForList(stepToReachGoalForEachLocation.ToArray());
+
+        return result;
+        
+        long LeastCommonMultipleForList(long[] numbers)
+        {
+            return numbers.Aggregate(LeastCommonMultiple);
+        }
+        long LeastCommonMultiple(long a, long b)
+        {
+            return Math.Abs(a * b) / GreatestCommonDivisor(a, b);
+        }
+        long GreatestCommonDivisor(long a, long b)
+        {
+            return b == 0 ? a : GreatestCommonDivisor(b, a % b);
+        }
     }
 }
 
