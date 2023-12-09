@@ -12,13 +12,23 @@ public static class StringExtensions
         return string.IsNullOrWhiteSpace(input);
     }
 
-    public static int[] SplitToNumbers(this string stringWithNumbers, char separator)
+    public static SequenceOfIntegers[] ToSequenceOfIntegers(this string[] inputLines, char separator = ' ')
     {
-        return stringWithNumbers.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt32(x.Trim())).ToArray();
+        return inputLines.Select(x => new SequenceOfIntegers(x.SplitToIntegers(separator))).ToArray();
     }
 
-    public static long[] SplitToLongNumbers(this string stringWithNumbers, char separator)
+    public static SequenceOfLongs[] ToSequenceOfLongs(this string[] inputLines, char separator = ' ')
     {
-        return stringWithNumbers.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt64(x.Trim())).ToArray();
+        return inputLines.Select(x => new SequenceOfLongs(x.SplitToLongs(separator))).ToArray();
+    }
+
+    public static int[] SplitToIntegers(this string inputString, char separator)
+    {
+        return inputString.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt32(x.Trim())).ToArray();
+    }
+
+    public static long[] SplitToLongs(this string inputString, char separator)
+    {
+        return inputString.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt64(x.Trim())).ToArray();
     }
 }

@@ -27,165 +27,169 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="InputData\Day01_Input.txt">
+    <None Update="Day01\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day05_Input.txt">
+    <None Update="Day05\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day08_Sample3.txt">
+    <None Update="Day08\Sample3.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day08_Sample2.txt">
+    <None Update="Day08\Sample2.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day11_Sample.txt">
+    <None Update="Day11\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day23_Input.txt">
+    <None Update="Day23\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day24_Input.txt">
+    <None Update="Day24\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day25_Input.txt">
+    <None Update="Day25\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day22_Input.txt">
+    <None Update="Day22\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day21_Input.txt">
+    <None Update="Day21\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day20_Input.txt">
+    <None Update="Day20\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day19_Input.txt">
+    <None Update="Day19\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day18_Input.txt">
+    <None Update="Day18\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day17_Input.txt">
+    <None Update="Day17\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day16_Input.txt">
+    <None Update="Day16\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day15_Input.txt">
+    <None Update="Day15\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day14_Input.txt">
+    <None Update="Day14\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day13_Input.txt">
+    <None Update="Day13\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day12_Input.txt">
+    <None Update="Day12\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day11_Input.txt">
+    <None Update="Day11\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day10_Input.txt">
+    <None Update="Day10\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day09_Input.txt">
+    <None Update="Day09\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day08_Input.txt">
+    <None Update="Day08\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day07_Input.txt">
+    <None Update="Day07\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day06_Input.txt">
+    <None Update="Day06\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day04_Input.txt">
+    <None Update="Day04\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day03_Input.txt">
+    <None Update="Day03\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day02_Input.txt">
+    <None Update="Day02\Input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day05_Sample.txt">
+    <None Update="Day05\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day06_Sample.txt">
+    <None Update="Day06\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day07_Sample.txt">
+    <None Update="Day07\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day08_Sample1.txt">
+    <None Update="Day08\Sample1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day09_Sample.txt">
+    <None Update="Day09\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day10_Sample.txt">
+    <None Update="Day10\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day12_Sample.txt">
+    <None Update="Day12\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day13_Sample.txt">
+    <None Update="Day13\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day14_Sample.txt">
+    <None Update="Day14\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day15_Sample.txt">
+    <None Update="Day15\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day16_Sample.txt">
+    <None Update="Day16\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day17_Sample.txt">
+    <None Update="Day17\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day18_Sample.txt">
+    <None Update="Day18\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day19_Sample.txt">
+    <None Update="Day19\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day20_Sample.txt">
+    <None Update="Day20\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day21_Sample.txt">
+    <None Update="Day21\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day22_Sample.txt">
+    <None Update="Day22\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day23_Sample.txt">
+    <None Update="Day23\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day24_Sample.txt">
+    <None Update="Day24\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day25_Sample.txt">
+    <None Update="Day25\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day04_Sample.txt">
+    <None Update="Day04\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day03_Sample.txt">
+    <None Update="Day03\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day02_Sample.txt">
+    <None Update="Day02\Sample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day01_Sample2.txt">
+    <None Update="Day01\Sample2.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="InputData\Day01_Sample1.txt">
+    <None Update="Day01\Sample1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="InputData\" />
   </ItemGroup>
 
 </Project>
