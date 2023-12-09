@@ -180,7 +180,7 @@ public static class Day05Extensions
             else
             {
                 //Seed Map Line
-                List<long> mapRangeNumbers = line.SplitToLongNumbers(' ');
+                long[] mapRangeNumbers = line.SplitToLongNumbers(' ');
                 Debug.Assert(currentMap != null, nameof(currentMap) + " != null");
                 currentMap.Ranges.Add(new Day05AlmanacMapRanges(mapRangeNumbers[0], mapRangeNumbers[1], mapRangeNumbers[2]));
             }

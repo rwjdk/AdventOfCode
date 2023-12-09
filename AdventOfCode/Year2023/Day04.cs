@@ -51,8 +51,8 @@ public static class Day04Extensions
         int card = Convert.ToInt32(cardAndNumbers[0][4..].Trim());
 
         string[] numberParts = cardAndNumbers[1].Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-        List<int> winningNumbers = numberParts[0].SplitToNumbers(' ');
-        List<int> yourNumbers = numberParts[1].SplitToNumbers(' ');
+        int[] winningNumbers = numberParts[0].SplitToNumbers(' ');
+        int[] yourNumbers = numberParts[1].SplitToNumbers(' ');
 
         return new Day04Card(card, winningNumbers, yourNumbers);
 
@@ -60,7 +60,7 @@ public static class Day04Extensions
     }
 }
 
-public record Day04Card(int Number, List<int> WinningNumbers, List<int> YourNumbers)
+public record Day04Card(int Number, int[] WinningNumbers, int[] YourNumbers)
 {
     public int GetPoints()
     {

@@ -53,7 +53,7 @@ public static class Day06Extensions
 
         var durations = instructionAndDurations[1].SplitToLongNumbers(' ');
         var recordTimes = instructionAndRecordDistances[1].SplitToLongNumbers(' ');
-        for (int i = 0; i < durations.Count; i++)
+        for (int i = 0; i < durations.Length; i++)
         {
             result.Add(new Day06Race(durations[i], recordTimes[i]));
         }

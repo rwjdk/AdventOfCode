@@ -12,13 +12,13 @@ public static class StringExtensions
         return string.IsNullOrWhiteSpace(input);
     }
 
-    public static List<int> SplitToNumbers(this string stringWithNumbers, char separator)
+    public static int[] SplitToNumbers(this string stringWithNumbers, char separator)
     {
-        return stringWithNumbers.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt32(x.Trim())).ToList();
+        return stringWithNumbers.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt32(x.Trim())).ToArray();
     }
 
-    public static List<long> SplitToLongNumbers(this string stringWithNumbers, char separator)
+    public static long[] SplitToLongNumbers(this string stringWithNumbers, char separator)
     {
-        return stringWithNumbers.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt64(x.Trim())).ToList();
+        return stringWithNumbers.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt64(x.Trim())).ToArray();
     }
 }
