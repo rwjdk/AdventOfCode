@@ -7,6 +7,7 @@ namespace Year2023.Day03;
 public class Day03
 {
     private const string Day = "Day03";
+
     //What is the sum of all of the part numbers in the engine schematic?
     [Theory]
     [InlineData($"{Day}\\Sample.txt", 10, true, 4361)]
@@ -21,12 +22,14 @@ public class Day03
         {
             SampleFileAssertions();
         }
+
         foreach (var line in schematic.Lines)
         {
             List<PartNumber> parts = line.Value.GetValidPartNumbers(schematic.GetLineAbove(line.Key), schematic.GetLineBelow(line.Key));
             var sum = parts.Sum(x => x.Number);
             calculatedAnswer += sum;
         }
+
         Assert.Equal(expectedAnswer, calculatedAnswer);
 
         void SampleFileAssertions()

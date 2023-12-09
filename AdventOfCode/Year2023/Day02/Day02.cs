@@ -40,6 +40,7 @@ public class Day02
             int power = neededGreen * neededBlue * neededRed;
             calculatedAnswer += power;
         }
+
         Assert.Equal(expectedPowerOfTheSets, calculatedAnswer);
     }
 }
@@ -109,6 +110,7 @@ public static class Day02Extensions
 
                 sets.Add(new GameSet(numberOfBlue, numberOfRed, numberOfGreen));
             }
+
             result.Add(new Game(gameNumber, sets.ToArray()));
 
             bool TryGetNumberOfAColor(string setRawCubeDistribution, string colorName, out int valueOfColor)

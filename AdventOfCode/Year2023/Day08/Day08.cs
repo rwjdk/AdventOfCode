@@ -45,12 +45,14 @@ public record Map(Direction[] Directions, Dictionary<string, Dictionary<Directio
             {
                 instructionIndex = 0;
             }
+
             Direction directionToGo = Directions[instructionIndex];
             end = Elements[currentLocation][directionToGo];
             currentLocation = end;
             instructionIndex++;
             steps++;
         }
+
         return steps;
     }
 
@@ -66,11 +68,13 @@ public record Map(Direction[] Directions, Dictionary<string, Dictionary<Directio
             {
                 instructionIndex = 0;
             }
+
             Direction directionToGo = Directions[instructionIndex];
             for (var i = 0; i < currentLocations.Length; i++)
             {
                 currentLocations[i] = Elements[currentLocations[i]][directionToGo];
             }
+
             instructionIndex++;
             steps++;
             if (currentLocations.All(x => x.EndsWith(destination)))
@@ -78,6 +82,7 @@ public record Map(Direction[] Directions, Dictionary<string, Dictionary<Directio
                 break;
             }
         }
+
         return steps;
     }
 
@@ -100,10 +105,12 @@ public record Map(Direction[] Directions, Dictionary<string, Dictionary<Directio
         {
             return numbers.Aggregate(LeastCommonMultiple);
         }
+
         long LeastCommonMultiple(long a, long b)
         {
             return Math.Abs(a * b) / GreatestCommonDivisor(a, b);
         }
+
         long GreatestCommonDivisor(long a, long b)
         {
             return b == 0 ? a : GreatestCommonDivisor(b, a % b);
@@ -132,10 +139,11 @@ public static class Day08Extensions
             var destinationParts = destinations.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             mapElements.Add(source, new Dictionary<Direction, string>
             {
-                { Direction.Left, destinationParts[0]},
-                { Direction.Right, destinationParts[1]},
+                { Direction.Left, destinationParts[0] },
+                { Direction.Right, destinationParts[1] },
             });
         }
+
         return new Map(directions, mapElements);
 
         Direction[] ParseDirection()

@@ -24,6 +24,7 @@ public class Day05
                 lowestLocation = location;
             }
         }
+
         Assert.Equal(expectedAnswer, lowestLocation);
     }
 
@@ -43,6 +44,7 @@ public class Day05
             task.Start();
             tasks.Add(task);
         }
+
         await Task.WhenAll(tasks);
 
         foreach (var task in tasks)
@@ -53,6 +55,7 @@ public class Day05
                 lowestLocation = location;
             }
         }
+
         Assert.Equal(expectedAnswer, lowestLocation);
     }
 }
@@ -79,7 +82,6 @@ public record SeedRange(long StartSeed, long Range)
     public override string ToString()
     {
         return $"Start:{StartSeed} - Range: {Range}";
-
     }
 }
 
@@ -95,6 +97,7 @@ public record Almanac(List<long> Seeds, Dictionary<string, AlmanacMap> Maps)
             result.Add(new SeedRange(seed, range));
             i++;
         }
+
         return result;
     }
 }
@@ -117,6 +120,7 @@ public record AlmanacMap(string SourceCategory, string DestinationCategory, List
                 return destination;
             }
         }
+
         //No Mapping, Source = Destination
         return source;
     }
@@ -146,6 +150,7 @@ public static class Day05Extensions
                 result = map.GetDestinationNumber(result);
             }
         }
+
         return result;
     }
 
@@ -171,6 +176,7 @@ public static class Day05Extensions
                 {
                     maps.Add(currentMap);
                 }
+
                 line = line.Remove(line.Length - 5); //Remove ' map:' part (we do not need it)
                 var sourceAndDestination = line.Split("-to-", StringSplitOptions.RemoveEmptyEntries);
                 string sourceCategory = sourceAndDestination[0];
@@ -195,4 +201,3 @@ public static class Day05Extensions
         return new Almanac(seeds, maps.ToDictionary(x => x.SourceCategory, y => y));
     }
 }
-

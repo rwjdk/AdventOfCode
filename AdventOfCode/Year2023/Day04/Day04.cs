@@ -39,6 +39,7 @@ public class Day04
                 }
             }
         }
+
         Assert.Equal(expectedAnswer, cards.Count);
     }
 }
@@ -55,8 +56,6 @@ public static class Day04Extensions
         int[] yourNumbers = numberParts[1].SplitToIntegers(' ');
 
         return new Card(card, winningNumbers, yourNumbers);
-
-
     }
 }
 
@@ -72,6 +71,7 @@ public record Card(int Number, int[] WinningNumbers, int[] YourNumbers)
             points = nextPointValue;
             nextPointValue = points * 2;
         }
+
         return points;
     }
 
@@ -83,6 +83,7 @@ public record Card(int Number, int[] WinningNumbers, int[] YourNumbers)
         {
             return _winningNumbersYouHaveCache;
         }
+
         _winningNumbersYouHaveCache = YourNumbers.Intersect(WinningNumbers).Count();
         return _winningNumbersYouHaveCache;
     }

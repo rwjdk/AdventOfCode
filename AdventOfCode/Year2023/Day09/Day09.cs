@@ -39,6 +39,7 @@ public static class Day09Extensions
         {
             return numberSequence.Last() + differenceSequence.GetNextNumberInSequence();
         }
+
         return numberSequence.Last();
     }
 

@@ -101,6 +101,7 @@ public class Hand(string handAsString, int bid, bool jokerRule)
             case 5:
                 return HandStrength.HighCard;
         }
+
         throw new ArgumentException("Invalid Input", nameof(handAsString));
     }
 
@@ -127,14 +128,17 @@ public class Hand(string handAsString, int bid, bool jokerRule)
                 {
                     return HandStrength.FourOfAKind;
                 }
+
                 if (singleJoker && anyThreeOfAKind)
                 {
                     return HandStrength.FourOfAKind;
                 }
+
                 if (singleJoker)
                 {
                     return HandStrength.FullHouse;
                 }
+
                 return anyThreeOfAKind ? HandStrength.ThreeOfAKind : HandStrength.TwoPair;
             case 4:
                 return anyJokers ? HandStrength.ThreeOfAKind : HandStrength.OnePair;

@@ -27,6 +27,7 @@ public class Day06
                 calculatedAnswer *= numberOfWays;
             }
         }
+
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 
@@ -57,6 +58,7 @@ public static class Day06Extensions
         {
             result.Add(new Race(durations[i], recordTimes[i]));
         }
+
         return result;
     }
 
