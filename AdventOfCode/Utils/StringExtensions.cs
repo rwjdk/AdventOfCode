@@ -12,23 +12,105 @@ public static class StringExtensions
         return string.IsNullOrWhiteSpace(input);
     }
 
-    public static SequenceOfIntegers[] ToSequenceOfIntegers(this string[] inputLines, char separator = ' ')
+    public static int[] SplitToIntegers(this string inputString, char separator = ' ')
     {
-        return inputLines.Select(x => new SequenceOfIntegers(x.SplitToIntegers(separator))).ToArray();
+        return inputString.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(x => Convert.ToInt32(x.Trim())).ToArray();
+    }
+    
+    public static long[] SplitToLongs(this string inputString, char separator = ' ')
+    {
+        return inputString.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(x => Convert.ToInt64(x.Trim())).ToArray();
+    }
+    
+    public static string[] SplitToStrings(this string inputString, char separator = ' ')
+    {
+        return inputString.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToArray();
+    }
+    
+    public static List<TOutputType[]> SplitTwice<TOutputType>(this string inputString, char split1Separator, char split2Separator)
+    {
+        var firstSplitValues = inputString.SplitToStrings(split1Separator);
+        if (typeof(TOutputType) == typeof(string))
+        {
+            return firstSplitValues.Select(x => x.SplitToStrings(split2Separator).Cast<TOutputType>().ToArray()).ToList();
+        }
+        if (typeof(TOutputType) == typeof(int))
+        {
+            return firstSplitValues.Select(x => x.SplitToIntegers(split2Separator).Cast<TOutputType>().ToArray()).ToList();
+        }
+        if (typeof(TOutputType) == typeof(long))
+        {
+            return firstSplitValues.Select(x => x.SplitToLongs(split2Separator).Cast<TOutputType>().ToArray()).ToList();
+        }
+
+        throw new NotSupportedException("Your T type is not supported");
     }
 
-    public static SequenceOfLongs[] ToSequenceOfLongs(this string[] inputLines, char separator = ' ')
+    public static string[] RemoveTheseChars(this string[] input, params char[] chars)
     {
-        return inputLines.Select(x => new SequenceOfLongs(x.SplitToLongs(separator))).ToArray();
+        var result = new List<string>();
+        foreach (var inputLine in input)
+        {
+            result.Add(inputLine.RemoveTheseChars(chars));
+        }
+        return result.ToArray();
     }
 
-    public static int[] SplitToIntegers(this string inputString, char separator)
+    public static string RemoveTheseChars(this string input, params char[] chars)
     {
-        return inputString.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt32(x.Trim())).ToArray();
+        foreach (var c in chars)
+        {
+            input = input.Replace(c.ToString(), string.Empty);
+        }
+
+        return input;
     }
 
-    public static long[] SplitToLongs(this string inputString, char separator)
+
+    public static PrefixWithInteger GetPrefixWithInteger(this string input, char separator = ':')
     {
-        return inputString.Split(new[] { separator }, StringSplitOptions.RemoveEmptyEntries).Select(x => Convert.ToInt64(x.Trim())).ToArray();
+        Prefix prefix = input.GetPrefix(separator);
+        var lastIndexOfSpace = prefix.PrefixText.LastIndexOf(' ');
+        var number = Convert.ToInt32(prefix.PrefixText.Substring(lastIndexOfSpace));
+        return new PrefixWithInteger(prefix.PrefixText, number, prefix.RestOfString);
     }
+    
+    public static Prefix GetPrefix(this string input, char separator = ':')
+    {
+        var indexOfSeparator = input.IndexOf(separator);
+        string prefix = input.Substring(0, indexOfSeparator).Trim();
+        return new Prefix(prefix, input.Substring(indexOfSeparator + 1).Trim());
+    }
+
+    /// <summary>
+    /// Remove Prefix from a string. Example: 'Game1: abc;def;123' >> 'abc;def;123'
+    /// </summary>
+    /// <param name="input">Input</param>
+    /// <param name="separator">Separator of prefix and data</param>
+    /// <returns>Rest of String</returns>
+    public static string RemovePrefix(this string input, char separator = ':')
+    {
+        var indexOfSeparator = input.IndexOf(separator);
+        return input.Substring(indexOfSeparator + 1).Trim();
+    }
+
+    public static KeyValuePair<string, int> GetIntegerAndIdentifier(this string input, char separator = ' ', ValueAndIdentiferOrder order = ValueAndIdentiferOrder.ValueIdentifer)
+    {
+        var parts = input.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        switch (order)
+        {
+            case ValueAndIdentiferOrder.ValueIdentifer:
+                return new KeyValuePair<string, int>(parts[1], parts[0].ToInteger());
+            case ValueAndIdentiferOrder.IdentifierValue:
+                return new KeyValuePair<string, int>(parts[0], parts[1].ToInteger());
+            default:
+                throw new ArgumentOutOfRangeException(nameof(order), order, null);
+        }
+    }
+}
+
+public enum ValueAndIdentiferOrder
+{
+    ValueIdentifer,
+    IdentifierValue
 }

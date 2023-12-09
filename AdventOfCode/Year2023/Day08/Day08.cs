@@ -132,11 +132,9 @@ public static class Day08Extensions
         Dictionary<string, Dictionary<Direction, string>> mapElements = [];
         for (int i = 2; i < inputLines.Length; i++)
         {
-            var element = inputLines[i];
-            var elementParts = element.Split("=", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var source = elementParts[0];
-            var destinations = elementParts[1].Replace("(", string.Empty).Replace(")", string.Empty);
-            var destinationParts = destinations.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var line = inputLines[i].RemoveTheseChars('(',')');
+            var (source, restOfString) = line.GetPrefix('=');
+            var destinationParts = restOfString.SplitToStrings(',');
             mapElements.Add(source, new Dictionary<Direction, string>
             {
                 { Direction.Left, destinationParts[0] },

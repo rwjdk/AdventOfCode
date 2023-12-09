@@ -80,52 +80,36 @@ public static class Day02Extensions
         List<Game> result = [];
         foreach (var input in inputLines)
         {
-            var indexOfColon = input.IndexOf(':', StringComparison.Ordinal);
-            int gameNumber = Convert.ToInt32(input.Substring(5, indexOfColon - 5));
-
+            var (_, number, restOfString) = input.GetPrefixWithInteger();
             List<GameSet> sets = [];
-            string setPartOfLine = input.Substring(indexOfColon + 1).Trim();
-            string[] setsRaw = setPartOfLine.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var setRaw in setsRaw)
+
+            var setsAndDistributions = restOfString.SplitTwice<string>(split1Separator: ';', split2Separator: ',');
+            foreach (var set in setsAndDistributions)
             {
                 int numberOfBlue = 0;
                 int numberOfRed = 0;
                 int numberOfGreen = 0;
-                string[] setRawCubeDistributions = setRaw.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var setRawCubeDistribution in setRawCubeDistributions)
+                foreach (var distribution in set)
                 {
-                    if (TryGetNumberOfAColor(setRawCubeDistribution, "blue", out int valueBlue))
+                    var (color, value) = distribution.GetIntegerAndIdentifier();
+                    switch (color)
                     {
-                        numberOfBlue = valueBlue;
-                    }
-                    else if (TryGetNumberOfAColor(setRawCubeDistribution, "red", out int valueRed))
-                    {
-                        numberOfRed = valueRed;
-                    }
-                    else if (TryGetNumberOfAColor(setRawCubeDistribution, "green", out int valueGreen))
-                    {
-                        numberOfGreen = valueGreen;
+                        case "blue":
+                            numberOfBlue = value;
+                            break;
+                        case "red":
+                            numberOfRed = value;
+                            break;
+                        case "green":
+                            numberOfGreen = value;
+                            break;
                     }
                 }
 
                 sets.Add(new GameSet(numberOfBlue, numberOfRed, numberOfGreen));
             }
 
-            result.Add(new Game(gameNumber, sets.ToArray()));
-
-            bool TryGetNumberOfAColor(string setRawCubeDistribution, string colorName, out int valueOfColor)
-            {
-                if (setRawCubeDistribution.Contains(colorName))
-                {
-                    setRawCubeDistribution = setRawCubeDistribution.Trim();
-                    var indexOfSpace = setRawCubeDistribution.IndexOf(' ');
-                    valueOfColor = Convert.ToInt32(setRawCubeDistribution.Substring(0, indexOfSpace));
-                    return true;
-                }
-
-                valueOfColor = 0;
-                return false;
-            }
+            result.Add(new Game(number, sets.ToArray()));
         }
 
         return result.ToArray();

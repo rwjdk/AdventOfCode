@@ -56,9 +56,7 @@ public static class Day07Extensions
         var result = new List<Hand>();
         foreach (var inputLine in inputLines)
         {
-            var parts = inputLine.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            var handAsString = parts[0];
-            var bid = Convert.ToInt32(parts[1]);
+            var (handAsString, bid) = inputLine.GetIntegerAndIdentifier(order: ValueAndIdentiferOrder.IdentifierValue);
             result.Add(new Hand(handAsString, bid, jokerRule));
         }
 

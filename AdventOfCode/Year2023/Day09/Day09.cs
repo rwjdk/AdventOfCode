@@ -13,8 +13,8 @@ public class Day09
     [InlineData($"{Day}\\Input.txt", 1904165718)]
     public void Part1(string inputFile, int expectedAnswer)
     {
-        var datasets = inputFile.ToLines().ToSequenceOfIntegers();
-        int calculatedAnswer = datasets.Sum(x => x.Numbers.GetNextNumberInSequence());
+        var datasets = inputFile.ToLines().Select(x => x.SplitToIntegers());
+        int calculatedAnswer = datasets.Sum(x => x.GetNextNumberInSequence());
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 
@@ -24,8 +24,8 @@ public class Day09
     [InlineData($"{Day}\\Input.txt", 964)]
     public void Part2(string inputFile, int expectedAnswer)
     {
-        var datasets = inputFile.ToLines().ToSequenceOfIntegers();
-        int calculatedAnswer = datasets.Sum(x => x.Numbers.GetPreviousNumberInSequence());
+        var datasets = inputFile.ToLines().Select(x=> x.SplitToIntegers());
+        int calculatedAnswer = datasets.Sum(x => x.GetPreviousNumberInSequence());
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 }

@@ -48,12 +48,8 @@ public static class Day06Extensions
     public static List<Race> ToDay06RacesPart1(this string[] lines)
     {
         var result = new List<Race>();
-
-        var instructionAndDurations = lines[0].Split(":", StringSplitOptions.RemoveEmptyEntries);
-        var instructionAndRecordDistances = lines[1].Split(":", StringSplitOptions.RemoveEmptyEntries);
-
-        var durations = instructionAndDurations[1].SplitToLongs(' ');
-        var recordTimes = instructionAndRecordDistances[1].SplitToLongs(' ');
+        var durations = lines[0].RemovePrefix().SplitToLongs();
+        var recordTimes = lines[1].RemovePrefix().SplitToLongs();
         for (int i = 0; i < durations.Length; i++)
         {
             result.Add(new Race(durations[i], recordTimes[i]));
@@ -64,11 +60,8 @@ public static class Day06Extensions
 
     public static Race ToDay06RacePart2(this string[] lines)
     {
-        var instructionAndDuration = lines[0].Split(":", StringSplitOptions.RemoveEmptyEntries);
-        var instructionAndRecordDistance = lines[1].Split(":", StringSplitOptions.RemoveEmptyEntries);
-
-        var duration = Convert.ToInt64(instructionAndDuration[1].Replace(" ", string.Empty));
-        var recordTime = Convert.ToInt64(instructionAndRecordDistance[1].Replace(" ", string.Empty));
+        var duration = Convert.ToInt64(lines[0].RemovePrefix().Replace(" ", string.Empty));
+        var recordTime = Convert.ToInt64(lines[1].RemovePrefix().Replace(" ", string.Empty));
 
         return new Race(duration, recordTime);
     }

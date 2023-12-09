@@ -85,12 +85,12 @@ public record SeedRange(long StartSeed, long Range)
     }
 }
 
-public record Almanac(List<long> Seeds, Dictionary<string, AlmanacMap> Maps)
+public record Almanac(long[] Seeds, Dictionary<string, AlmanacMap> Maps)
 {
     public List<SeedRange> GetSeedRanges()
     {
         var result = new List<SeedRange>();
-        for (int i = 0; i < Seeds.Count; i++)
+        for (int i = 0; i < Seeds.Length; i++)
         {
             var seed = Seeds[i];
             var range = Seeds[i + 1];
@@ -156,8 +156,7 @@ public static class Day05Extensions
 
     public static Almanac ToDay05Almanac(this string[] input)
     {
-        var seedLine = input[0];
-        var seeds = seedLine.Substring(seedLine.IndexOf(':') + 1).SplitToLongs(' ').ToList();
+        var seeds = input[0].RemovePrefix().SplitToLongs();
 
         List<AlmanacMap> maps = [];
         AlmanacMap? currentMap = null;
@@ -186,7 +185,7 @@ public static class Day05Extensions
             else
             {
                 //Seed Map Line
-                long[] mapRangeNumbers = line.SplitToLongs(' ');
+                long[] mapRangeNumbers = line.SplitToLongs();
                 Debug.Assert(currentMap != null, nameof(currentMap) + " != null");
                 currentMap.Ranges.Add(new AlmanacMapRanges(mapRangeNumbers[0], mapRangeNumbers[1], mapRangeNumbers[2]));
             }

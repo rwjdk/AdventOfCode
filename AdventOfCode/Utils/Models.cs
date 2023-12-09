@@ -1,5 +1,5 @@
 ﻿namespace Utils;
 
-public record SequenceOfIntegers(int[] Numbers);
+public record PrefixWithInteger(string PrefixText, int Number, string RestOfString);
 
-public record SequenceOfLongs(long[] Numbers);
+public record Prefix(string PrefixText, string RestOfString);

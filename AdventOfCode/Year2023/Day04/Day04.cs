@@ -48,14 +48,9 @@ public static class Day04Extensions
 {
     public static Card ToDay04Card(this string line)
     {
-        string[] cardAndNumbers = line.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-        int card = Convert.ToInt32(cardAndNumbers[0][4..].Trim());
-
-        string[] numberParts = cardAndNumbers[1].Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-        int[] winningNumbers = numberParts[0].SplitToIntegers(' ');
-        int[] yourNumbers = numberParts[1].SplitToIntegers(' ');
-
-        return new Card(card, winningNumbers, yourNumbers);
+        var (_, number, restOfString) = line.GetPrefixWithInteger();
+        var WinningAndYourNumbers = restOfString.SplitTwice<int>('|', ' ');
+        return new Card(number, WinningAndYourNumbers[0], WinningAndYourNumbers[1]);
     }
 }
 
