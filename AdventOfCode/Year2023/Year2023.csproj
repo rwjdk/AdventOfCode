@@ -188,8 +188,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="InputData\" />
-  </ItemGroup>
-
 </Project>

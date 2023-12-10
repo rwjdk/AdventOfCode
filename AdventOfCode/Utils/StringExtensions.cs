@@ -65,8 +65,7 @@ public static class StringExtensions
 
         return input;
     }
-
-
+    
     public static PrefixWithInteger GetPrefixWithInteger(this string input, char separator = ':')
     {
         Prefix prefix = input.GetPrefix(separator);
@@ -107,10 +106,4 @@ public static class StringExtensions
                 throw new ArgumentOutOfRangeException(nameof(order), order, null);
         }
     }
-}
-
-public enum ValueAndIdentiferOrder
-{
-    ValueIdentifer,
-    IdentifierValue
 }
