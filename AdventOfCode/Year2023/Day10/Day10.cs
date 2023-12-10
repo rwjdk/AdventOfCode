@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using Utils;
 
 namespace Year2023.Day10;
@@ -10,28 +11,34 @@ public class Day10
 
     //How many steps along the loop does it take to get from the starting position to the point farthest from the starting position?
     [Theory]
-    //[InlineData($"{Day}\\Sample1.txt", 4)]
-    //[InlineData($"{Day}\\Sample2.txt", 4)]
+    [InlineData($"{Day}\\Sample1.txt", 4)]
+    [InlineData($"{Day}\\Sample2.txt", 4)]
     [InlineData($"{Day}\\Sample3.txt", 8)]
-    //[InlineData($"{Day}\\Sample4.txt", 8)]
-    //[InlineData($"{Day}\\Input.txt", 0)]
+    [InlineData($"{Day}\\Sample4.txt", 8)]
+    [InlineData($"{Day}\\Input.txt", 6682)]
     public void Part1(string inputFile, int expectedAnswer)
     {
         var maze = inputFile.ToLines().ToDay10Maze();
+        //var visualize = maze.Visualize();
         var calculatedAnswer = maze.Start.GetStepsToFarthestPoint();
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 
-    //TODO: Add Part 2 Description
+    //How many tiles are enclosed by the loop?
     [Theory]
-    [InlineData($"{Day}\\Sample.txt", 0)]
-    [InlineData($"{Day}\\Input.txt", 0)]
+    [InlineData($"{Day}\\Sample5.txt", 4)]
+    [InlineData($"{Day}\\Sample6.txt", 4)]
+    //[InlineData($"{Day}\\Input.txt", 0)]
     public void Part2(string inputFile, int expectedAnswer)
     {
-        int calculatedAnswer = 0;
-        var inputLines = inputFile.ToLines();
-        throw new NotImplementedException();
-        Assert.Equal(expectedAnswer, calculatedAnswer);
+        var maze = inputFile.ToLines().ToDay10Maze();
+        //var visualize = maze.Visualize();
+        maze.RemoveNonLoopJunkPipes();
+        //todo - enlarge maze so pipe gaps are own tile
+        maze.FloodFillTileFromEdgesWithEscapeGround();
+
+        var enclosedTiles = maze.GetRemainingGroundTiles().Length;
+        Assert.Equal(expectedAnswer, enclosedTiles);
     }
 }
 
@@ -39,217 +46,318 @@ public static class Day10Extensions
 {
     public static Maze ToDay10Maze(this string[] lines)
     {
-        MazePart[,] mazeParts = new MazePart[lines[0].Length, lines.Length];
+        MazeTile[,] mazeTile = new MazeTile[lines[0].Length, lines.Length];
         for (int y = 0; y < lines.Length; y++)
         {
             var line = lines[y];
             for (int x = 0; x < lines[0].Length; x++)
             {
-                int yAfterPaddingLater = y + 1;
-                int xAfterPaddingLater = x + 1;
-                mazeParts[x, y] = new MazePart(yAfterPaddingLater, xAfterPaddingLater, ToType(line[x]));
+                var symbol = line[x];
+                mazeTile[x, y] = new MazeTile(y, x, ToType(symbol), symbol);
             }
         }
 
-        mazeParts = mazeParts.PadArray(1, new MazePart(-1, -1, MazePartType.Ground));
-        return new Maze(mazeParts).ExploreSurroundingsAndReturn();
+        return new Maze(mazeTile).ExploreSurroundingsAndReturn();
 
-        MazePartType ToType(char symbol)
+        MazeTileType ToType(char symbol)
         {
             return symbol switch
             {
-                'S' => MazePartType.Start,
-                '.' => MazePartType.Ground,
-                '|' => MazePartType.VerticalPipe,
-                '-' => MazePartType.HorizontalPipe,
-                'L' => MazePartType.NorthAndEastBend,
-                'J' => MazePartType.NorthAndWestBend,
-                '7' => MazePartType.SouthAndWestBend,
-                'F' => MazePartType.SouthAndEastBend,
+                'S' => MazeTileType.Start,
+                '.' => MazeTileType.Ground,
+                'O' => MazeTileType.Ground,
+                'I' => MazeTileType.Ground,
+                '|' => MazeTileType.VerticalPipe,
+                '-' => MazeTileType.HorizontalPipe,
+                'L' => MazeTileType.NorthAndEastBend,
+                'J' => MazeTileType.NorthAndWestBend,
+                '7' => MazeTileType.SouthAndWestBend,
+                'F' => MazeTileType.SouthAndEastBend,
                 _ => throw new NotSupportedException($"Symbol '{symbol}' is not supported")
             };
         }
     }
+
+    public static void FloodFillWithEscapeGround(this MazeTile escapeTile)
+    {
+        foreach (MazeTile tile in escapeTile.ValidEscapeTiles.Where(x => x.Type == MazeTileType.Ground))
+        {
+            tile.ChangeToOutside();
+            tile.FloodFillWithEscapeGround();
+        }
+    }
 }
 
-public record Maze(MazePart[,] Parts)
+public record Maze(MazeTile[,] Tiles)
 {
-    public MazePart Start { get; set; }
+    public MazeTile Start { get; set; }
 
     public Maze ExploreSurroundingsAndReturn()
     {
-        for (int y = 0; y < Parts.GetLength(1); y++)
+        Start = GetStart();
+        Start.DetermineStartType(Tiles);
+        var allTiles = GetAllTiles().ToArray();
+        foreach (MazeTile tile in allTiles)
         {
-            for (int x = 0; x < Parts.GetLength(0); x++)
+            tile.AttachNorthSouthEastAndWest(Tiles);
+        }
+        foreach (MazeTile tile in allTiles)
+        {
+            tile.DetermineValidConnections();
+        }
+        return this;
+
+        MazeTile GetStart()
+        {
+            for (int y = 0; y < Tiles.GetLength(1); y++)
             {
-                MazePart mazePart = Parts[x, y];
-                mazePart.AttachNorthSouthEastAndWest(Parts);
-                mazePart.DetermineStartAndValidConnections(this);
+                for (int x = 0; x < Tiles.GetLength(0); x++)
+                {
+                    MazeTile mazeTile = Tiles[x, y];
+                    if (mazeTile.Type == MazeTileType.Start)
+                    {
+                        return mazeTile;
+                    }
+                }
+            }
+
+            throw new NotSupportedException("No Start was found");
+        }
+    }
+
+    private IEnumerable<MazeTile> GetAllTiles()
+    {
+        for (int y = 0; y < Tiles.GetLength(1); y++)
+        {
+            for (int x = 0; x < Tiles.GetLength(0); x++)
+            {
+                yield return Tiles[x, y];
             }
         }
+    }
 
-        return this;
+    public string Visualize()
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int y = 0; y < Tiles.GetLength(1); y++)
+        {
+            for (int x = 0; x < Tiles.GetLength(0); x++)
+            {
+                MazeTile mazeTile = Tiles[x, y];
+                sb.Append(mazeTile.Symbol);
+            }
+            sb.Append(Environment.NewLine);
+        }
+
+        return sb.ToString();
+    }
+
+    public void RemoveNonLoopJunkPipes()
+    {
+        var allTiles = GetAllTiles().ToList();
+        foreach (MazeTile tile in allTiles)
+        {
+            if (!tile.PartOfLoop)
+            {
+                tile.ChangeToGround();
+            }
+        }
+        foreach (MazeTile tile in allTiles)
+        {
+            if (!tile.PartOfLoop)
+            {
+                tile.DetermineValidEscapeTiles();
+            }
+        }
+    }
+
+    public void FloodFillTileFromEdgesWithEscapeGround()
+    {
+        var edgeTiles = GetGroundEdgeTiles();
+        foreach (MazeTile edgeTile in edgeTiles)
+        {
+            edgeTile.FloodFillWithEscapeGround();
+        }
+    }
+
+    private MazeTile[] GetGroundEdgeTiles()
+    {
+        return GetAllTiles().Where(tile => tile.Type == MazeTileType.Ground && (tile.X == 0 || tile.X == Tiles.GetLength(0) - 1 || tile.Y == 0 || tile.Y == Tiles.GetLength(1) - 1)).ToArray();
+    }
+
+    public MazeTile[] GetRemainingGroundTiles()
+    {
+        return GetAllTiles().Where(x => x.Type == MazeTileType.Ground).ToArray();
     }
 }
 
-[DebuggerDisplay("{Type}")]
-public class MazePart(int yCoordinate, int xCoordinate, MazePartType type)
+[DebuggerDisplay("{Type} | X={X} | Y={Y}")]
+public class MazeTile(int y, int x, MazeTileType type, char symbol)
 {
-    public string Id { get; } = $"{xCoordinate}_{yCoordinate}";
-    public MazePart North { get; set; }
-    public bool CanGoNorth { get; set; }
-    public MazePart South { get; set; }
-    public bool CanGoSouth { get; set; }
-    public MazePart East { get; set; }
-    public bool CanGoEast { get; set; }
-    public MazePart West { get; set; }
-    public bool CanGoWest { get; set; }
-    public MazePart[] ValidConnections { get; set; } = Array.Empty<MazePart>();
-    public int Y { get; init; } = yCoordinate;
-    public int X { get; init; } = xCoordinate;
-    public MazePartType Type { get; private set; } = type;
+    public string Id { get; } = $"X{x}Y{y}";
+    private MazeTile? North { get; set; }
+    private bool CanGoNorth { get; set; }
+    private MazeTile? South { get; set; }
+    private bool CanGoSouth { get; set; }
+    private MazeTile? East { get; set; }
+    private bool CanGoEast { get; set; }
+    private MazeTile? West { get; set; }
+    private bool CanGoWest { get; set; }
+    private MazeTile[] ValidConnections { get; set; } = [];
+    public MazeTile[] ValidEscapeTiles { get; private set; } = [];
+    public int Y { get; } = y;
+    public int X { get; } = x;
+    public MazeTileType Type { get; internal set; } = type;
+    public char Symbol { get; private set; } = symbol;
+    public bool PartOfLoop { get; private set; }
+    public bool Start { get; set; }
 
-    public void AttachNorthSouthEastAndWest(MazePart[,] allMazeParts)
+    public void AttachNorthSouthEastAndWest(MazeTile[,] allMazeTiles)
     {
-        if (Y == -1 || X == -1)
-        {
-            //Padding area so no need to do anything
-            return;
-        }
-        North = allMazeParts[X, Y - 1];
-        South = allMazeParts[X, Y + 1];
-        East = allMazeParts[X + 1, Y];
-        West = allMazeParts[X - 1, Y];
+        North = Y - 1 >= 0 ? allMazeTiles[X, Y - 1] : null;
+        South = Y + 1 < allMazeTiles.GetLength(1) ? allMazeTiles[X, Y + 1] : null;
+        East = X + 1 < allMazeTiles.GetLength(0) ? allMazeTiles[X + 1, Y] : null;
+        West = X - 1 >= 0 ? allMazeTiles[X - 1, Y] : null;
     }
 
-
-    public void DetermineStartAndValidConnections(Maze maze)
+    public void DetermineStartType(MazeTile[,] allMazeTiles)
     {
-        if (Y == -1 || X == -1)
+        AttachNorthSouthEastAndWest(allMazeTiles);
+        CanGoNorth = North?.Type is MazeTileType.VerticalPipe or MazeTileType.SouthAndEastBend or MazeTileType.SouthAndWestBend;
+        CanGoSouth = South?.Type is MazeTileType.VerticalPipe or MazeTileType.NorthAndEastBend or MazeTileType.NorthAndWestBend;
+        CanGoEast = East?.Type is MazeTileType.HorizontalPipe or MazeTileType.NorthAndWestBend or MazeTileType.SouthAndWestBend;
+        CanGoWest = West?.Type is MazeTileType.HorizontalPipe or MazeTileType.NorthAndEastBend or MazeTileType.SouthAndEastBend;
+
+        List<MazeTileType> possibleStartTypes =
+        [
+            MazeTileType.VerticalPipe,
+            MazeTileType.HorizontalPipe,
+            MazeTileType.SouthAndWestBend,
+            MazeTileType.NorthAndWestBend,
+            MazeTileType.SouthAndEastBend,
+            MazeTileType.NorthAndEastBend
+        ];
+
+        if (CanGoNorth)
         {
-            //Padding area so no need to do anything
-            return;
+            North!.PartOfLoop = true;
+            ValidConnections = ValidConnections.Append(North!).ToArray();
+            possibleStartTypes.Remove(MazeTileType.HorizontalPipe);
+            possibleStartTypes.Remove(MazeTileType.SouthAndWestBend);
+            possibleStartTypes.Remove(MazeTileType.SouthAndEastBend);
+        }
+        if (CanGoSouth)
+        {
+            South!.PartOfLoop = true;
+            ValidConnections = ValidConnections.Append(South!).ToArray();
+            possibleStartTypes.Remove(MazeTileType.HorizontalPipe);
+            possibleStartTypes.Remove(MazeTileType.NorthAndWestBend);
+            possibleStartTypes.Remove(MazeTileType.NorthAndEastBend);
+        }
+        if (CanGoEast)
+        {
+            East!.PartOfLoop = true;
+            ValidConnections = ValidConnections.Append(East!).ToArray();
+            possibleStartTypes.Remove(MazeTileType.VerticalPipe);
+            possibleStartTypes.Remove(MazeTileType.NorthAndWestBend);
+            possibleStartTypes.Remove(MazeTileType.SouthAndWestBend);
+        }
+        if (CanGoWest)
+        {
+            West!.PartOfLoop = true;
+            ValidConnections = ValidConnections.Append(West!).ToArray();
+            possibleStartTypes.Remove(MazeTileType.VerticalPipe);
+            possibleStartTypes.Remove(MazeTileType.NorthAndEastBend);
+            possibleStartTypes.Remove(MazeTileType.SouthAndEastBend);
         }
 
+        Type = possibleStartTypes.Single();
+        Start = true;
+    }
+
+    public void DetermineValidConnections()
+    {
         switch (Type)
         {
-            case MazePartType.Start:
-                maze.Start = this;
-                CanGoNorth = North.Type is MazePartType.VerticalPipe or MazePartType.SouthAndEastBend or MazePartType.SouthAndWestBend;
-                CanGoSouth = South.Type is MazePartType.VerticalPipe or MazePartType.NorthAndEastBend or MazePartType.NorthAndWestBend;
-                CanGoEast = East.Type is MazePartType.HorizontalPipe or MazePartType.NorthAndWestBend or MazePartType.SouthAndWestBend;
-                CanGoWest = West.Type is MazePartType.HorizontalPipe or MazePartType.NorthAndEastBend or MazePartType.SouthAndEastBend;
-
-                List<MazePartType> possibleStartTypes =
-                [
-                    MazePartType.VerticalPipe,
-                    MazePartType.HorizontalPipe,
-                    MazePartType.SouthAndWestBend,
-                    MazePartType.NorthAndWestBend,
-                    MazePartType.SouthAndEastBend,
-                    MazePartType.NorthAndEastBend
-                ];
-
-                if (CanGoNorth)
-                {
-                    ValidConnections = ValidConnections.Append(North).ToArray();
-                    possibleStartTypes.Remove(MazePartType.HorizontalPipe);
-                    possibleStartTypes.Remove(MazePartType.SouthAndWestBend);
-                    possibleStartTypes.Remove(MazePartType.SouthAndEastBend);
-                }
-                if (CanGoSouth)
-                {
-                    ValidConnections = ValidConnections.Append(South).ToArray();
-                    possibleStartTypes.Remove(MazePartType.HorizontalPipe);
-                    possibleStartTypes.Remove(MazePartType.NorthAndWestBend);
-                    possibleStartTypes.Remove(MazePartType.NorthAndEastBend);
-                }
-                if (CanGoEast)
-                {
-                    ValidConnections = ValidConnections.Append(East).ToArray();
-                    possibleStartTypes.Remove(MazePartType.VerticalPipe);
-                    possibleStartTypes.Remove(MazePartType.NorthAndWestBend);
-                    possibleStartTypes.Remove(MazePartType.SouthAndWestBend);
-                }
-                if (CanGoWest)
-                {
-                    ValidConnections = ValidConnections.Append(West).ToArray();
-                    possibleStartTypes.Remove(MazePartType.VerticalPipe);
-                    possibleStartTypes.Remove(MazePartType.NorthAndEastBend);
-                    possibleStartTypes.Remove(MazePartType.SouthAndEastBend);
-                }
-
-                Type = possibleStartTypes.Single();
-                break;
-            case MazePartType.VerticalPipe:
-                CanGoNorth = North.Type is MazePartType.VerticalPipe or MazePartType.SouthAndEastBend or MazePartType.SouthAndWestBend;
-                CanGoSouth = South.Type is MazePartType.VerticalPipe or MazePartType.NorthAndEastBend or MazePartType.NorthAndWestBend;
+            case MazeTileType.VerticalPipe:
+                CanGoNorth = North?.Type is MazeTileType.VerticalPipe or MazeTileType.SouthAndEastBend or MazeTileType.SouthAndWestBend;
+                CanGoSouth = South?.Type is MazeTileType.VerticalPipe or MazeTileType.NorthAndEastBend or MazeTileType.NorthAndWestBend;
                 CanGoEast = false;
                 CanGoWest = false;
                 if (CanGoNorth && CanGoSouth)
                 {
+                    North!.PartOfLoop = true;
+                    South!.PartOfLoop = true;
                     ValidConnections = [North, South];
                 }
                 break;
-            case MazePartType.HorizontalPipe:
+            case MazeTileType.HorizontalPipe:
                 CanGoNorth = false;
                 CanGoSouth = false;
-                CanGoEast = East.Type is MazePartType.HorizontalPipe or MazePartType.NorthAndWestBend or MazePartType.SouthAndWestBend;
-                CanGoWest = West.Type is MazePartType.HorizontalPipe or MazePartType.NorthAndEastBend or MazePartType.SouthAndEastBend;
+                CanGoEast = East?.Type is MazeTileType.HorizontalPipe or MazeTileType.NorthAndWestBend or MazeTileType.SouthAndWestBend;
+                CanGoWest = West?.Type is MazeTileType.HorizontalPipe or MazeTileType.NorthAndEastBend or MazeTileType.SouthAndEastBend;
                 if (CanGoEast && CanGoWest)
                 {
+                    East!.PartOfLoop = true;
+                    West!.PartOfLoop = true;
                     ValidConnections = [East, West];
                 }
                 break;
-            case MazePartType.NorthAndEastBend:
-                CanGoNorth = North.Type is MazePartType.VerticalPipe or MazePartType.SouthAndEastBend or MazePartType.SouthAndWestBend;
+            case MazeTileType.NorthAndEastBend:
+                CanGoNorth = North?.Type is MazeTileType.VerticalPipe or MazeTileType.SouthAndEastBend or MazeTileType.SouthAndWestBend;
                 CanGoSouth = false;
-                CanGoEast = East.Type is MazePartType.HorizontalPipe or MazePartType.NorthAndWestBend or MazePartType.SouthAndWestBend;
+                CanGoEast = East?.Type is MazeTileType.HorizontalPipe or MazeTileType.NorthAndWestBend or MazeTileType.SouthAndWestBend;
                 CanGoWest = false;
                 if (CanGoNorth && CanGoEast)
                 {
+                    North!.PartOfLoop = true;
+                    East!.PartOfLoop = true;
                     ValidConnections = [North, East];
                 }
                 break;
-            case MazePartType.NorthAndWestBend:
-                CanGoNorth = North.Type is MazePartType.VerticalPipe or MazePartType.SouthAndEastBend or MazePartType.SouthAndWestBend;
+            case MazeTileType.NorthAndWestBend:
+                CanGoNorth = North?.Type is MazeTileType.VerticalPipe or MazeTileType.SouthAndEastBend or MazeTileType.SouthAndWestBend;
                 CanGoSouth = false;
                 CanGoEast = false;
-                CanGoWest = West.Type is MazePartType.HorizontalPipe or MazePartType.NorthAndEastBend or MazePartType.SouthAndEastBend;
+                CanGoWest = West?.Type is MazeTileType.HorizontalPipe or MazeTileType.NorthAndEastBend or MazeTileType.SouthAndEastBend;
                 if (CanGoNorth && CanGoWest)
                 {
+                    North!.PartOfLoop = true;
+                    West!.PartOfLoop = true;
                     ValidConnections = [North, West];
                 }
                 break;
-            case MazePartType.SouthAndEastBend:
+            case MazeTileType.SouthAndEastBend:
                 CanGoNorth = false;
-                CanGoSouth = South.Type is MazePartType.VerticalPipe or MazePartType.NorthAndEastBend or MazePartType.NorthAndWestBend;
-                CanGoEast = East.Type is MazePartType.HorizontalPipe or MazePartType.NorthAndWestBend or MazePartType.SouthAndWestBend;
+                CanGoSouth = South?.Type is MazeTileType.VerticalPipe or MazeTileType.NorthAndEastBend or MazeTileType.NorthAndWestBend;
+                CanGoEast = East?.Type is MazeTileType.HorizontalPipe or MazeTileType.NorthAndWestBend or MazeTileType.SouthAndWestBend;
                 CanGoWest = false;
                 if (CanGoSouth && CanGoEast)
                 {
-                    ValidConnections = [North, South];
+                    South!.PartOfLoop = true;
+                    East!.PartOfLoop = true;
+                    ValidConnections = [South, East];
                 }
                 break;
-            case MazePartType.SouthAndWestBend:
+            case MazeTileType.SouthAndWestBend:
                 CanGoNorth = false;
-                CanGoSouth = South.Type is MazePartType.VerticalPipe or MazePartType.NorthAndEastBend or MazePartType.NorthAndWestBend;
+                CanGoSouth = South?.Type is MazeTileType.VerticalPipe or MazeTileType.NorthAndEastBend or MazeTileType.NorthAndWestBend;
                 CanGoEast = false;
-                CanGoWest = West.Type is MazePartType.HorizontalPipe or MazePartType.NorthAndEastBend or MazePartType.SouthAndEastBend;
+                CanGoWest = West?.Type is MazeTileType.HorizontalPipe or MazeTileType.NorthAndEastBend or MazeTileType.SouthAndEastBend;
                 if (CanGoSouth && CanGoWest)
                 {
+                    South!.PartOfLoop = true;
+                    West!.PartOfLoop = true;
                     ValidConnections = [South, West];
                 }
                 break;
-            case MazePartType.Ground:
+            case MazeTileType.Ground:
                 CanGoNorth = false;
                 CanGoSouth = false;
                 CanGoEast = false;
                 CanGoWest = false;
-                ValidConnections = Array.Empty<MazePart>();
+                ValidConnections = Array.Empty<MazeTile>();
                 break;
-            default:
-                throw new ArgumentOutOfRangeException();
         }
     }
 
@@ -257,8 +365,8 @@ public class MazePart(int yCoordinate, int xCoordinate, MazePartType type)
     {
         int steps = 1;
         List<string> explored = [Id];
-        MazePart direction1 = ValidConnections.First();
-        MazePart direction2 = ValidConnections.Last();
+        MazeTile direction1 = ValidConnections.First();
+        MazeTile direction2 = ValidConnections.Last();
         while (direction1.Id != direction2.Id)
         {
             explored.Add(direction1.Id);
@@ -270,9 +378,41 @@ public class MazePart(int yCoordinate, int xCoordinate, MazePartType type)
 
         return steps;
     }
+
+    public void ChangeToGround()
+    {
+        Symbol = '.';
+        Type = MazeTileType.Ground;
+    }
+
+    public void DetermineValidEscapeTiles()
+    {
+        if (North?.Type == MazeTileType.Ground)
+        {
+            ValidEscapeTiles = ValidEscapeTiles.Append(North!).ToArray();
+        }
+        if (South?.Type == MazeTileType.Ground)
+        {
+            ValidEscapeTiles = ValidEscapeTiles.Append(South!).ToArray();
+        }
+        if (East?.Type == MazeTileType.Ground)
+        {
+            ValidEscapeTiles = ValidEscapeTiles.Append(East!).ToArray();
+        }
+        if (West?.Type == MazeTileType.Ground)
+        {
+            ValidEscapeTiles = ValidEscapeTiles.Append(West!).ToArray();
+        }
+    }
+
+    public void ChangeToOutside()
+    {
+        Symbol = 'O';
+        Type = MazeTileType.GroundOutside;
+    }
 }
 
-public enum MazePartType
+public enum MazeTileType
 {
     Start,
     VerticalPipe,
@@ -282,5 +422,6 @@ public enum MazePartType
     SouthAndEastBend,
     SouthAndWestBend,
     Ground,
-    Invalid
+    Invalid,
+    GroundOutside
 }
