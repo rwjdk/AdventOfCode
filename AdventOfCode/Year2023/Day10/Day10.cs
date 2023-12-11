@@ -20,23 +20,27 @@ public class Day10
     {
         var maze = inputFile.ToLines().ToDay10Maze();
         //var visualize = maze.Visualize();
-        var calculatedAnswer = maze.Start.GetStepsToFarthestPoint();
+        var calculatedAnswer = maze.Start!.GetStepsToFarthestPoint();
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 
     //How many tiles are enclosed by the loop?
     [Theory]
-    [InlineData($"{Day}\\Sample5.txt", 4)]
-    [InlineData($"{Day}\\Sample6.txt", 4)]
+    //[InlineData($"{Day}\\Sample5.txt", 4)]
+    //[InlineData($"{Day}\\Sample6.txt", 4)]
+    //[InlineData($"{Day}\\Sample7.txt", 8)]
+    [InlineData($"{Day}\\Sample8.txt", 10)]
     //[InlineData($"{Day}\\Input.txt", 0)]
     public void Part2(string inputFile, int expectedAnswer)
     {
         var maze = inputFile.ToLines().ToDay10Maze();
         //var visualize = maze.Visualize();
         maze.RemoveNonLoopJunkPipes();
+
+        var visualize1 = maze.Visualize();
         //todo - enlarge maze so pipe gaps are own tile
         maze.FloodFillTileFromEdgesWithEscapeGround();
-
+        var visualize2 = maze.Visualize();
         var enclosedTiles = maze.GetRemainingGroundTiles().Length;
         Assert.Equal(expectedAnswer, enclosedTiles);
     }
@@ -56,31 +60,30 @@ public static class Day10Extensions
                 mazeTile[x, y] = new MazeTile(y, x, ToType(symbol), symbol);
             }
         }
-
         return new Maze(mazeTile).ExploreSurroundingsAndReturn();
+    }
 
-        MazeTileType ToType(char symbol)
+    private static MazeTileType ToType(char symbol)
+    {
+        return symbol switch
         {
-            return symbol switch
-            {
-                'S' => MazeTileType.Start,
-                '.' => MazeTileType.Ground,
-                'O' => MazeTileType.Ground,
-                'I' => MazeTileType.Ground,
-                '|' => MazeTileType.VerticalPipe,
-                '-' => MazeTileType.HorizontalPipe,
-                'L' => MazeTileType.NorthAndEastBend,
-                'J' => MazeTileType.NorthAndWestBend,
-                '7' => MazeTileType.SouthAndWestBend,
-                'F' => MazeTileType.SouthAndEastBend,
-                _ => throw new NotSupportedException($"Symbol '{symbol}' is not supported")
-            };
-        }
+            'S' => MazeTileType.Start,
+            '.' => MazeTileType.Ground,
+            'O' => MazeTileType.Ground,
+            'I' => MazeTileType.Ground,
+            '|' => MazeTileType.VerticalPipe,
+            '-' => MazeTileType.HorizontalPipe,
+            'L' => MazeTileType.NorthAndEastBend,
+            'J' => MazeTileType.NorthAndWestBend,
+            '7' => MazeTileType.SouthAndWestBend,
+            'F' => MazeTileType.SouthAndEastBend,
+            _ => throw new NotSupportedException($"Symbol '{symbol}' is not supported")
+        };
     }
 
     public static void FloodFillWithEscapeGround(this MazeTile escapeTile)
     {
-        foreach (MazeTile tile in escapeTile.ValidEscapeTiles.Where(x => x.Type == MazeTileType.Ground))
+        foreach (MazeTile tile in escapeTile.ValidEscapeTiles.Where(x => x.Type == MazeTileType.Ground || x.Symbol == 'V' || x.Symbol == 'H' ||x.Symbol == '.'))
         {
             tile.ChangeToOutside();
             tile.FloodFillWithEscapeGround();
@@ -90,7 +93,7 @@ public static class Day10Extensions
 
 public record Maze(MazeTile[,] Tiles)
 {
-    public MazeTile Start { get; set; }
+    public MazeTile? Start { get; private set; }
 
     public Maze ExploreSurroundingsAndReturn()
     {
@@ -144,7 +147,31 @@ public record Maze(MazeTile[,] Tiles)
             for (int x = 0; x < Tiles.GetLength(0); x++)
             {
                 MazeTile mazeTile = Tiles[x, y];
-                sb.Append(mazeTile.Symbol);
+                if (mazeTile.Symbol == '.' && mazeTile.Type != MazeTileType.Ground)
+                {
+                    switch (mazeTile.Type)
+                    {
+                        case MazeTileType.SouthAndWestBend:
+                            sb.Append("7");
+                            break;
+                        case MazeTileType.SouthAndEastBend:
+                            sb.Append("F");
+                            break;
+                        case MazeTileType.NorthAndWestBend:
+                            sb.Append("J");
+                            break;
+                        case MazeTileType.NorthAndEastBend:
+                            sb.Append("F");
+                            break;
+                        default:
+                            sb.Append(mazeTile.Symbol);
+                            break;
+                    }
+                }
+                else
+                {
+                    sb.Append(mazeTile.Symbol);
+                }
             }
             sb.Append(Environment.NewLine);
         }
@@ -162,11 +189,24 @@ public record Maze(MazeTile[,] Tiles)
                 tile.ChangeToGround();
             }
         }
+
         foreach (MazeTile tile in allTiles)
         {
-            if (!tile.PartOfLoop)
+            if (tile.PartOfLoop)
             {
-                tile.DetermineValidEscapeTiles();
+                tile.DetermineTunnels();
+            }
+        }
+
+        foreach (MazeTile tile in allTiles)
+        {
+            if (tile.Id == "X4Y8")
+            {
+                int i = 0;
+            }
+            if (!tile.PartOfLoop || tile.Symbol == 'V' || tile.Symbol == 'H' || tile.Symbol == '.')
+            {
+                tile.DetermineValidEscapeTiles(this);
             }
         }
     }
@@ -187,7 +227,8 @@ public record Maze(MazeTile[,] Tiles)
 
     public MazeTile[] GetRemainingGroundTiles()
     {
-        return GetAllTiles().Where(x => x.Type == MazeTileType.Ground).ToArray();
+        var mazeTiles = GetAllTiles().Where(x => x.Type == MazeTileType.Ground);
+        return mazeTiles.ToArray();
     }
 }
 
@@ -197,7 +238,7 @@ public class MazeTile(int y, int x, MazeTileType type, char symbol)
     public string Id { get; } = $"X{x}Y{y}";
     private MazeTile? North { get; set; }
     private bool CanGoNorth { get; set; }
-    private MazeTile? South { get; set; }
+    public MazeTile? South { get; set; }
     private bool CanGoSouth { get; set; }
     private MazeTile? East { get; set; }
     private bool CanGoEast { get; set; }
@@ -208,7 +249,7 @@ public class MazeTile(int y, int x, MazeTileType type, char symbol)
     public int Y { get; } = y;
     public int X { get; } = x;
     public MazeTileType Type { get; internal set; } = type;
-    public char Symbol { get; private set; } = symbol;
+    public char Symbol { get; set; } = symbol;
     public bool PartOfLoop { get; private set; }
     public bool Start { get; set; }
 
@@ -385,30 +426,90 @@ public class MazeTile(int y, int x, MazeTileType type, char symbol)
         Type = MazeTileType.Ground;
     }
 
-    public void DetermineValidEscapeTiles()
+    public void DetermineValidEscapeTiles(Maze maze)
     {
-        if (North?.Type == MazeTileType.Ground)
+        if (North?.Type == MazeTileType.Ground || North?.Symbol == 'V' || North?.Symbol == '.')
         {
-            ValidEscapeTiles = ValidEscapeTiles.Append(North!).ToArray();
+            if (Symbol == 'V' || Symbol == '.')
+            {
+                AddValidEscapeTile(North);
+                North.AddValidEscapeTile(this);
+            }
         }
-        if (South?.Type == MazeTileType.Ground)
+
+        if (South?.Type == MazeTileType.Ground || South?.Symbol == 'V' || South?.Symbol == '.')
         {
-            ValidEscapeTiles = ValidEscapeTiles.Append(South!).ToArray();
+            if (Symbol == 'V' || Symbol == '.')
+            {
+                AddValidEscapeTile(South);
+                South.AddValidEscapeTile(this);
+            }
         }
-        if (East?.Type == MazeTileType.Ground)
+        if (East?.Type == MazeTileType.Ground || East?.Symbol == 'H' || East?.Symbol == '.')
         {
-            ValidEscapeTiles = ValidEscapeTiles.Append(East!).ToArray();
+            if (Symbol == 'H' || Symbol == '.')
+            {
+                AddValidEscapeTile(East);
+                East.AddValidEscapeTile(this);
+            }
         }
-        if (West?.Type == MazeTileType.Ground)
+        if (West?.Type == MazeTileType.Ground || West?.Symbol == 'H' || West?.Symbol == '.')
         {
-            ValidEscapeTiles = ValidEscapeTiles.Append(West!).ToArray();
+            if (symbol == 'H' || symbol == '.')
+            {
+                AddValidEscapeTile(West);
+                West.AddValidEscapeTile(this);
+            }
         }
+    }
+
+    private void AddValidEscapeTile(MazeTile mazeTile)
+    {
+        ValidEscapeTiles = ValidEscapeTiles.Append(mazeTile).ToArray();
     }
 
     public void ChangeToOutside()
     {
         Symbol = 'O';
         Type = MazeTileType.GroundOutside;
+    }
+
+    public void DetermineTunnels()
+    {
+        if (Type == MazeTileType.NorthAndEastBend && West?.Type is MazeTileType.NorthAndWestBend or MazeTileType.SouthAndWestBend)
+        {
+            Symbol = 'V';
+        }
+
+        if (Type == MazeTileType.NorthAndWestBend && East?.Type is MazeTileType.NorthAndEastBend or MazeTileType.SouthAndEastBend)
+        {
+            Symbol = 'V';
+        }
+
+        if (Type == MazeTileType.SouthAndEastBend && West?.Type is MazeTileType.SouthAndWestBend or MazeTileType.NorthAndWestBend)
+        {
+            Symbol = 'V';
+        }
+
+        if (Type == MazeTileType.SouthAndWestBend && East?.Type is MazeTileType.SouthAndEastBend or MazeTileType.NorthAndEastBend)
+        {
+            Symbol = 'V';
+        }
+
+        if (Type == MazeTileType.VerticalPipe && (West?.Type == MazeTileType.VerticalPipe || East?.Type == MazeTileType.VerticalPipe))
+        {
+            Symbol = 'V';
+        }
+
+        if (Type == MazeTileType.HorizontalPipe && (North?.Type == MazeTileType.HorizontalPipe || South?.Type == MazeTileType.HorizontalPipe))
+        {
+            Symbol = 'H';
+        }
+
+        if (Type == MazeTileType.SouthAndEastBend && (North?.Type == MazeTileType.Ground || West?.Type == MazeTileType.Ground))
+        {
+            Symbol = '.';
+        }
     }
 }
 
