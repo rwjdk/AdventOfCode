@@ -12,40 +12,41 @@ public class Day11
     //What is the sum of these lengths?
     [Theory]
     [InlineData($"{Day}\\Sample.txt", 374)]
-    [InlineData($"{Day}\\Input.txt", 0)]
+    [InlineData($"{Day}\\Input.txt", 9329143)]
     public void Part1(string inputFile, int expectedAnswer)
     {
-        var starMap = inputFile.ToLines().ToDay11StarMap();
+        var starMap = inputFile.ToLines().ToDay11StarMap(1);
         //var visualize = starMap.Visualize(true);
         var calculatedAnswer = starMap.FindShortestPathsAndSum();
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 
-    //TODO: Add Part 2 Description
+    //What is the sum of the ancient galaxy lenghts
     [Theory]
-    [InlineData($"{Day}\\Sample.txt", 0)]
-    [InlineData($"{Day}\\Input.txt", 0)]
-    public void Part2(string inputFile, int expectedAnswer)
+    [InlineData($"{Day}\\Sample.txt", 10, 1030)]
+    [InlineData($"{Day}\\Sample.txt", 100, 8410)]
+    //[InlineData($"{Day}\\Input.txt", 0)]
+    public void Part2(string inputFile, int sizeIncrease, int expectedAnswer)
     {
-        int calculatedAnswer = 0;
-        var inputLines = inputFile.ToLines();
-        throw new NotImplementedException();
+        var starMap = inputFile.ToLines().ToDay11StarMap(sizeIncrease-1);
+        //var visualize = starMap.Visualize(true);
+        var calculatedAnswer = starMap.FindShortestPathsAndSum();
         Assert.Equal(expectedAnswer, calculatedAnswer);
     }
 }
 
 public static class Day11Extensions
 {
-    public static StarMap ToDay11StarMap(this string[] inputLines)
+    public static StarMap ToDay11StarMap(this string[] inputLines, int emptySpaceIncrease)
     {
         List<int> rowsWithNoGalaxies = FindEmptyRows();
         List<int> columnsWithNoGalaxies = FindEmptyColumns();
-        List<Point> galaxyLocations = new List<Point>();
-        var columns = inputLines[0].Length;
-        var columnsExpanded = columns + columnsWithNoGalaxies.Count;
-        var rows = inputLines.Length;
-        var rowsExpanded = rows + rowsWithNoGalaxies.Count;
-        var rowOffset = 0;
+        List<Point> galaxyLocations = [];
+        long columns = inputLines[0].Length;
+        long columnsExpanded = columns + columnsWithNoGalaxies.Count*emptySpaceIncrease;
+        long rows = inputLines.Length;
+        long rowsExpanded = rows + rowsWithNoGalaxies.Count*emptySpaceIncrease;
+        long rowOffset = 0;
 
         Point[,] points = new Point[columnsExpanded, rowsExpanded];
         int galaxyNumber = 0;
@@ -56,8 +57,11 @@ public static class Day11Extensions
             AddColumnData();
             if (rowsWithNoGalaxies.Contains(row))
             {
-                rowOffset++;
-                AddColumnData();
+                for (int i = 0; i < emptySpaceIncrease; i++)
+                {
+                    rowOffset++;
+                    AddColumnData();
+                }
             }
 
             void AddColumnData()
@@ -81,12 +85,15 @@ public static class Day11Extensions
                         var x = column + columnOffset;
                         points[x, y] = new Point('.', x, y);
                     }
-                    
+
                     if (columnsWithNoGalaxies.Contains(column))
                     {
-                        columnOffset++;
-                        var x = column + columnOffset;
-                        points[x, y] = new Point('.', x, y);
+                        for (int i = 0; i < emptySpaceIncrease; i++)
+                        {
+                            columnOffset++;
+                            var x = column + columnOffset;
+                            points[x, y] = new Point('.', x, y);
+                        }
                     }
                 }
             }
@@ -127,11 +134,11 @@ public static class Day11Extensions
     }
 }
 
-public class Point(char content, int x, int y, int galaxyNumber = -1)
+public class Point(char content, long x, long y, int galaxyNumber = -1)
 {
     public char Content { get; } = content;
-    public int X { get; set; } = x;
-    public int Y { get; set; } = y;
+    public long X { get; set; } = x;
+    public long Y { get; set; } = y;
     public int GalaxyNumber { get; } = galaxyNumber;
     public Dictionary<int, int> Routes { get; set; } = new();
 }
@@ -155,7 +162,7 @@ public record StarMap(Point[,] Points, Point[] GalaxyLocations)
                     sb.Append((point?.Content ?? '?'));
                 }
 
-                
+
             }
             sb.Append(Environment.NewLine);
         }
@@ -180,7 +187,7 @@ public record StarMap(Point[,] Points, Point[] GalaxyLocations)
                 {
                     continue;//Already visited
                 }
-                
+
                 int moves = 0;
                 var pathLocation = new Point('X', from.X, from.Y);
                 while (pathLocation.X != to.X || pathLocation.Y != to.Y)
@@ -206,10 +213,12 @@ public record StarMap(Point[,] Points, Point[] GalaxyLocations)
                         //Move Left/Right
                         if (pathLocation.X > to.X)
                         {
+                            //Move Left
                             pathLocation.X--;
                         }
                         else
                         {
+                            //Move Right
                             pathLocation.X++;
                         }
                     }

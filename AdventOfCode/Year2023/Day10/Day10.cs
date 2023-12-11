@@ -26,10 +26,10 @@ public class Day10
 
     //How many tiles are enclosed by the loop?
     [Theory]
-    //[InlineData($"{Day}\\Sample5.txt", 4)]
-    //[InlineData($"{Day}\\Sample6.txt", 4)]
-    //[InlineData($"{Day}\\Sample7.txt", 8)]
-    [InlineData($"{Day}\\Sample8.txt", 10)]
+    [InlineData($"{Day}\\Sample5.txt", 4)]
+    [InlineData($"{Day}\\Sample6.txt", 4)]
+    [InlineData($"{Day}\\Sample7.txt", 8)]
+    //[InlineData($"{Day}\\Sample8.txt", 10)]
     //[InlineData($"{Day}\\Input.txt", 0)]
     public void Part2(string inputFile, int expectedAnswer)
     {
